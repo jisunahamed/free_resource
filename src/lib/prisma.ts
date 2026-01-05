@@ -1,21 +1,15 @@
 import { PrismaClient } from '@prisma/client'
-import { Pool } from 'pg'
-import { PrismaPg } from '@prisma/adapter-pg'
+import { Pool, neonConfig } from '@neondatabase/serverless'
+import { PrismaNeon } from '@prisma/adapter-neon'
+import ws from 'ws'
+
+neonConfig.webSocketConstructor = ws
 
 const prismaClientSingleton = () => {
-    let connectionString = process.env.DATABASE_URL
-
-    // Fix: Remove channel_binding if present (not supported by node-postgres)
-    if (connectionString && connectionString.includes('channel_binding')) {
-        connectionString = connectionString.replace(/&channel_binding=[^&]+/, '').replace(/\?channel_binding=[^&]+&?/, '?')
-    }
-
-    const pool = new Pool({
-        connectionString,
-        ssl: connectionString?.includes('sslmode=require') ? true : (connectionString?.includes('sslmode=disable') ? false : undefined),
-        max: 10 // recommended for serverless/lambdas
-    })
-    const adapter = new PrismaPg(pool)
+    // Neon adapter handles the connection string parsing automatically
+    const connectionString = process.env.DATABASE_URL
+    const pool = new Pool({ connectionString })
+    const adapter = new PrismaNeon(pool)
     return new PrismaClient({ adapter })
 }
 
