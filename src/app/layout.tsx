@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   description: "Free tools and learning resources for everyone.",
 };
 
+import { Navbar } from "@/components/layout/Navbar";
+import { Footer } from "@/components/layout/Footer";
+
+// ... imports
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -16,8 +21,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased text-text base-bg`}>
-        {children}
+      <body className={`${inter.variable} font-sans antialiased text-text base-bg min-h-screen flex flex-col`}>
+        <Navbar />
+        <main className="flex-1">{children}</main>
+        <Footer />
       </body>
     </html>
   );
